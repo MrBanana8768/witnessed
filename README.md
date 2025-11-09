@@ -220,7 +220,7 @@ flutter build web --release
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+All Rights Reserved - Copyright 2025
 
 ## 🙏 Acknowledgments
 
