@@ -317,6 +317,10 @@ class PollData extends Equatable {
     this.totalVotes = 0,
   });
   
+  // JSON serialization
+  factory PollData.fromJson(Map<String, dynamic> json) => _$PollDataFromJson(json);
+  Map<String, dynamic> toJson() => _$PollDataToJson(this);
+
   factory PollData.fromMap(Map<String, dynamic> map) {
     return PollData(
       question: map['question'],
@@ -328,7 +332,7 @@ class PollData extends Equatable {
       totalVotes: map['totalVotes'] ?? 0,
     );
   }
-  
+
   Map<String, dynamic> toMap() {
     return {
       'question': question,
@@ -364,6 +368,10 @@ class PollOption extends Equatable {
     this.voterIds = const [],
   });
   
+  // JSON serialization
+  factory PollOption.fromJson(Map<String, dynamic> json) => _$PollOptionFromJson(json);
+  Map<String, dynamic> toJson() => _$PollOptionToJson(this);
+
   factory PollOption.fromMap(Map<String, dynamic> map) {
     return PollOption(
       id: map['id'],
@@ -372,7 +380,7 @@ class PollOption extends Equatable {
       voterIds: List<String>.from(map['voterIds'] ?? []),
     );
   }
-  
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -382,7 +390,12 @@ class PollOption extends Equatable {
     };
   }
   
-  double get percentage => votes > 0 ? (votes / 100) * 100 : 0;
+  // Note: This calculates percentage relative to this option's votes only.
+  // To calculate percentage of total votes, you need to pass totalVotes from parent PollData
+  double getPercentage(int totalVotes) {
+    if (totalVotes == 0) return 0.0;
+    return (votes / totalVotes) * 100;
+  }
   
   @override
   List<Object?> get props => [id, text, votes, voterIds];

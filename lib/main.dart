@@ -1,103 +1,74 @@
-import 'package:flutter/material.dart';
+import 'package:Witnessed/screens/auth/login_screen.dart';
+import 'package:Witnessed/screens/auth/splash_screen.dart';
+import 'package:Witnessed/screens/home/home_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart';
 
-// Config
-import 'config/theme.dart';
-import 'config/routes.dart';
+import 'firebase_options.dart';
+import 'package:Witnessed/providers/auth_provider.dart' as app_auth_provider;
+import 'package:Witnessed/providers/profile_provider.dart';
+import 'package:Witnessed/services/auth_service.dart';
 
-// Providers
-import 'providers/auth_provider.dart';
-import 'providers/user_provider.dart';
-import 'providers/posts_provider.dart';
-import 'providers/theme_provider.dart';
-
-// Services
-import 'services/auth_service.dart';
-import 'services/database_service.dart';
-import 'services/storage_service.dart';
-import 'services/ai_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize Firebase
-  await Firebase.initializeApp();
-  
-  // Initialize services
-  await _initializeServices();
-  
-  runApp(const MyApp());
-}
-
-Future<void> _initializeServices() async {
-  // Initialize any services that need setup before app starts
-  // For example: notifications, local storage, etc.
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // Services
-        Provider<AuthService>(
-          create: (_) => AuthService(),
+        ChangeNotifierProvider(create: (_) => AuthService()),
+        ChangeNotifierProxyProvider<AuthService, app_auth_provider.AuthProvider>(
+          create: (_) => app_auth_provider.AuthProvider(authService: AuthService()),
+          update: (_, authService, previous) =>
+              previous ?? app_auth_provider.AuthProvider(authService: authService),
         ),
-        Provider<DatabaseService>(
-          create: (_) => DatabaseService(),
-        ),
-        Provider<StorageService>(
-          create: (_) => StorageService(),
-        ),
-        Provider<AIService>(
-          create: (_) => AIService(),
-        ),
-        
-        // Providers that depend on services
-        ChangeNotifierProxyProvider<AuthService, AuthProvider>(
-          create: (context) => AuthProvider(
-            authService: context.read<AuthService>(),
-          ),
-          update: (context, authService, authProvider) =>
-              authProvider!..update(authService),
-        ),
-        
-        ChangeNotifierProxyProvider<DatabaseService, UserProvider>(
-          create: (context) => UserProvider(
-            databaseService: context.read<DatabaseService>(),
-          ),
-          update: (context, databaseService, userProvider) =>
-              userProvider!..update(databaseService),
-        ),
-        
-        ChangeNotifierProxyProvider<DatabaseService, PostsProvider>(
-          create: (context) => PostsProvider(
-            databaseService: context.read<DatabaseService>(),
-          ),
-          update: (context, databaseService, postsProvider) =>
-              postsProvider!..update(databaseService),
-        ),
-        
-        ChangeNotifierProvider<ThemeProvider>(
-          create: (_) => ThemeProvider(),
-        ),
+        ChangeNotifierProvider(create: (_) => ProfileProvider()),
       ],
-      child: Consumer<ThemeProvider>(
-        builder: (context, themeProvider, child) {
-          return MaterialApp.router(
-            title: 'AI Social Platform',
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: themeProvider.themeMode,
-            routerConfig: AppRouter.router,
-          );
-        },
+      child: MaterialApp(
+        title: 'AI Social Platform',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          brightness: Brightness.light,
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.blue,
+            brightness: Brightness.light,
+          ),
+        ),
+        home: AuthWrapper(),
       ),
+    );
+  }
+}
+
+class AuthWrapper extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+    
+    return StreamBuilder<User?>(
+      stream: authService.authStateChanges,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return SplashScreen();
+        }
+        
+        if (snapshot.hasData && snapshot.data != null) {
+          return HomeScreen();
+        }
+        
+        return LoginScreen();
+      },
     );
   }
 }

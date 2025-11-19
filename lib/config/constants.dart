@@ -5,8 +5,8 @@ class AppConstants {
   static const String appDescription = 'AI-powered social media platform';
   
   // API Endpoints
-  static const String apiBaseUrl = 'https://api.example.com/v1';
-  static const String aiApiBaseUrl = 'https://ai-api.example.com/v1';
+  static const String apiBaseUrl = 'https://api.instituteofconsciousnessawareness.com/v1';
+  static const String aiApiBaseUrl = 'https://ai-api.instituteofconsciousnessawareness.com/v1';
   
   // Firebase Collections
   static const String usersCollection = 'users';

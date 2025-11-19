@@ -21,7 +21,6 @@ class AppTheme {
       primary: primaryColor,
       secondary: secondaryColor,
       tertiary: accentColor,
-      background: backgroundColor,
       surface: Colors.white,
       error: errorColor,
     ),
@@ -161,12 +160,11 @@ class AppTheme {
     ),
     
     // Card Theme
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     ),
     
     // Icon Theme
@@ -194,7 +192,6 @@ class AppTheme {
       primary: primaryColor,
       secondary: Color(0xFFF7F9FA),
       tertiary: Color(0xFF8899A6),
-      background: Color(0xFF15202B),
       surface: Color(0xFF192734),
       error: errorColor,
     ),
@@ -261,15 +258,8 @@ class AppTheme {
     ),
     
     // Card Theme
-    cardTheme: CardTheme(
-      elevation: 2,
-      color: const Color(0xFF192734),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-    ),
-    
+    cardTheme: CardThemeData(elevation: 2, color: const Color(0xFF192734), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
+
     // Divider Theme
     dividerTheme: const DividerThemeData(
       color: Color(0xFF38444D),

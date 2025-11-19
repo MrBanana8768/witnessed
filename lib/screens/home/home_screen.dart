@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../services/auth_service.dart';
+
+import '../../services/auth_service.dart';
+import '../profile/profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -129,7 +131,16 @@ class HomeScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 48,
                 child: OutlinedButton.icon(
-                  onPressed: () => _showComingSoon(context, 'User Profile'),
+                  onPressed: () {
+                    if (user?.uid != null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProfileScreen(userId: user!.uid),
+                        ),
+                      );
+                    }
+                  },
                   icon: Icon(Icons.person_outline),
                   label: Text('Profile'),
                   style: OutlinedButton.styleFrom(

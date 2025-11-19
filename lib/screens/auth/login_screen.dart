@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../services/auth_service.dart';
+import '../../providers/auth_provider.dart';
+import '../../config/constants.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -12,46 +13,60 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _displayNameController = TextEditingController();
-  
+  final _usernameController = TextEditingController();
+
   bool _isSignUp = false;
   bool _isLoading = false;
   bool _obscurePassword = true;
-  
+
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     _displayNameController.dispose();
+    _usernameController.dispose();
     super.dispose();
   }
   
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     setState(() => _isLoading = true);
-    
-    final authService = Provider.of<AuthService>(context, listen: false);
-    String? error;
-    
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    bool success;
+
     if (_isSignUp) {
-      error = await authService.signUp(
-        email: _emailController.text,
-        password: _passwordController.text,
-        displayName: _displayNameController.text,
+      // Sign up - creates both Firebase Auth AND Firestore profile
+      success = await authProvider.signUp(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+        displayName: _displayNameController.text.trim(),
+        username: _usernameController.text.trim(),
       );
+
+      if (success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Account created successfully! Profile saved to database.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
     } else {
-      error = await authService.signIn(
-        email: _emailController.text,
-        password: _passwordController.text,
+      // Sign in
+      success = await authProvider.signIn(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
       );
     }
-    
+
     setState(() => _isLoading = false);
-    
-    if (error != null && mounted) {
+
+    if (!success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(error),
+          content: Text(authProvider.error ?? 'An error occurred'),
           backgroundColor: Colors.red,
         ),
       );
@@ -60,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
   
   Future<void> _resetPassword() async {
     final email = _emailController.text.trim();
-    
+
     if (email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -70,12 +85,12 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       return;
     }
-    
-    final authService = Provider.of<AuthService>(context, listen: false);
-    final error = await authService.resetPassword(email: email);
-    
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final success = await authProvider.resetPassword(email: email);
+
     if (mounted) {
-      if (error == null) {
+      if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Password reset email sent to $email'),
@@ -85,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(error),
+            content: Text(authProvider.error ?? 'Failed to send reset email'),
             backgroundColor: Colors.red,
           ),
         );
@@ -111,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: 16),
                 Text(
-                  'AI Social Platform',
+                  'Witnessed',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).primaryColor,
@@ -131,13 +146,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   key: _formKey,
                   child: Column(
                     children: [
-                      // Display Name (only for sign up)
+                      // Display Name & Username (only for sign up)
                       if (_isSignUp) ...[
                         TextFormField(
                           controller: _displayNameController,
                           decoration: InputDecoration(
                             labelText: 'Display Name',
-                            hintText: 'Enter your display name',
+                            hintText: 'John Doe',
                             prefixIcon: Icon(Icons.person),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -146,12 +161,41 @@ class _LoginScreenState extends State<LoginScreen> {
                             fillColor: Colors.grey[50],
                           ),
                           textInputAction: TextInputAction.next,
+                          maxLength: AppConstants.maxDisplayNameLength,
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
-                              return 'Please enter your display name';
+                              return 'Display name is required';
+                            }
+                            if (value.trim().length < 2) {
+                              return 'Display name must be at least 2 characters';
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 16),
+                        TextFormField(
+                          controller: _usernameController,
+                          decoration: InputDecoration(
+                            labelText: 'Username',
+                            hintText: 'johndoe',
+                            prefixIcon: Icon(Icons.alternate_email),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            filled: true,
+                            fillColor: Colors.grey[50],
+                          ),
+                          textInputAction: TextInputAction.next,
+                          maxLength: AppConstants.maxUsernameLength,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Username is required';
                             }
                             if (value.trim().length < 3) {
-                              return 'Display name must be at least 3 characters';
+                              return 'Username must be at least 3 characters';
+                            }
+                            if (!AppConstants.usernameRegex.hasMatch(value.trim())) {
+                              return 'Only letters, numbers, and underscores allowed';
                             }
                             return null;
                           },

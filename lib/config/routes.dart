@@ -3,20 +3,19 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 // Screens
-import '../screens/splash_screen.dart';
+import '../screens/auth/splash_screen.dart';
 import '../screens/auth/login_screen.dart';
-import '../screens/auth/signup_screen.dart';
-import '../screens/auth/forgot_password_screen.dart';
+// import '../screens/auth/signup_screen.dart';
+// import '../screens/auth/forgot_password_screen.dart';
 import '../screens/home/home_screen.dart';
-import '../screens/home/feed_screen.dart';
-import '../screens/post/create_post_screen.dart';
-import '../screens/post/post_detail_screen.dart';
-import '../screens/post/edit_post_screen.dart';
+// import '../screens/home/feed_screen.dart';
+// import '../screens/post/create_post_screen.dart';
+// import '../screens/post/post_detail_screen.dart';
+// import '../screens/post/edit_post_screen.dart';
 import '../screens/profile/profile_screen.dart';
-import '../screens/profile/edit_profile_screen.dart';
-import '../screens/profile/settings_screen.dart';
-import '../screens/ai/ai_chat_screen.dart';
-import '../screens/ai/ai_suggestions_screen.dart';
+// import '../screens/profile/settings_screen.dart';
+// import '../screens/ai/ai_chat_screen.dart';
+// import '../screens/ai/ai_suggestions_screen.dart';
 
 // Providers
 import '../providers/auth_provider.dart';
@@ -29,17 +28,18 @@ class AppRouter {
       final authProvider = context.read<AuthProvider>();
       final isAuthenticated = authProvider.isAuthenticated;
       final isAuthRoute = state.matchedLocation == '/login' ||
+          state.matchedLocation == '/' ||
           state.matchedLocation == '/signup' ||
           state.matchedLocation == '/forgot-password';
-      
+
       if (!isAuthenticated && !isAuthRoute) {
         return '/login';
       }
-      
-      if (isAuthenticated && isAuthRoute) {
+
+      if (isAuthenticated && (isAuthRoute && state.matchedLocation != '/')) {
         return '/home';
       }
-      
+
       return null;
     },
     routes: [
@@ -47,64 +47,68 @@ class AppRouter {
       GoRoute(
         path: '/',
         name: 'splash',
-        builder: (context, state) => const SplashScreen(),
+        builder: (context, state) => SplashScreen(),
       ),
       
       // Auth Routes
       GoRoute(
         path: '/login',
         name: 'login',
-        builder: (context, state) => const LoginScreen(),
+        builder: (context, state) => LoginScreen(),
       ),
-      GoRoute(
-        path: '/signup',
-        name: 'signup',
-        builder: (context, state) => const SignupScreen(),
-      ),
-      GoRoute(
-        path: '/forgot-password',
-        name: 'forgotPassword',
-        builder: (context, state) => const ForgotPasswordScreen(),
-      ),
+      // TODO: Create SignupScreen
+      // GoRoute(
+      //   path: '/signup',
+      //   name: 'signup',
+      //   builder: (context, state) => const SignupScreen(),
+      // ),
+      // TODO: Create ForgotPasswordScreen
+      // GoRoute(
+      //   path: '/forgot-password',
+      //   name: 'forgotPassword',
+      //   builder: (context, state) => const ForgotPasswordScreen(),
+      // ),
       
       // Main App Routes
       GoRoute(
         path: '/home',
         name: 'home',
-        builder: (context, state) => const HomeScreen(),
-        routes: [
-          // Nested routes for home
-          GoRoute(
-            path: 'feed',
-            name: 'feed',
-            builder: (context, state) => const FeedScreen(),
-          ),
-        ],
+        builder: (context, state) => HomeScreen(),
+        // TODO: Uncomment when FeedScreen is created
+        // routes: [
+        //   // Nested routes for home
+        //   GoRoute(
+        //     path: 'feed',
+        //     name: 'feed',
+        //     builder: (context, state) => const FeedScreen(),
+        //   ),
+        // ],
       ),
-      
+
+      // TODO: Uncomment Post Routes when screens are created
       // Post Routes
-      GoRoute(
-        path: '/post/create',
-        name: 'createPost',
-        builder: (context, state) => const CreatePostScreen(),
-      ),
-      GoRoute(
-        path: '/post/:id',
-        name: 'postDetail',
-        builder: (context, state) {
-          final postId = state.pathParameters['id']!;
-          return PostDetailScreen(postId: postId);
-        },
-      ),
-      GoRoute(
-        path: '/post/:id/edit',
-        name: 'editPost',
-        builder: (context, state) {
-          final postId = state.pathParameters['id']!;
-          return EditPostScreen(postId: postId);
-        },
-      ),
-      
+      // GoRoute(
+      //   path: '/post/create',
+      //   name: 'createPost',
+      //   builder: (context, state) => const CreatePostScreen(),
+      // ),
+      // GoRoute(
+      //   path: '/post/:id',
+      //   name: 'postDetail',
+      //   builder: (context, state) {
+      //     final postId = state.pathParameters['id']!;
+      //     return PostDetailScreen(postId: postId);
+      //   },
+      // ),
+      // GoRoute(
+      //   path: '/post/:id/edit',
+      //   name: 'editPost',
+      //   builder: (context, state) {
+      //     final postId = state.pathParameters['id']!;
+      //     return EditPostScreen(postId: postId);
+      //   },
+      // ),
+
       // Profile Routes
       GoRoute(
         path: '/profile/:userId',
@@ -113,31 +117,26 @@ class AppRouter {
           final userId = state.pathParameters['userId']!;
           return ProfileScreen(userId: userId);
         },
-        routes: [
-          GoRoute(
-            path: 'edit',
-            name: 'editProfile',
-            builder: (context, state) => const EditProfileScreen(),
-          ),
-        ],
       ),
-      GoRoute(
-        path: '/settings',
-        name: 'settings',
-        builder: (context, state) => const SettingsScreen(),
-      ),
-      
+      // TODO: Uncomment Settings Route when screen is created
+      // GoRoute(
+      //   path: '/settings',
+      //   name: 'settings',
+      //   builder: (context, state) => const SettingsScreen(),
+      // ),
+
+      // TODO: Uncomment AI Routes when screens are created
       // AI Routes
-      GoRoute(
-        path: '/ai/chat',
-        name: 'aiChat',
-        builder: (context, state) => const AIChatScreen(),
-      ),
-      GoRoute(
-        path: '/ai/suggestions',
-        name: 'aiSuggestions',
-        builder: (context, state) => const AISuggestionsScreen(),
-      ),
+      // GoRoute(
+      //   path: '/ai/chat',
+      //   name: 'aiChat',
+      //   builder: (context, state) => const AIChatScreen(),
+      // ),
+      // GoRoute(
+      //   path: '/ai/suggestions',
+      //   name: 'aiSuggestions',
+      //   builder: (context, state) => const AISuggestionsScreen(),
+      // ),
     ],
     
     // Error Page
