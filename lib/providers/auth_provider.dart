@@ -107,19 +107,26 @@ class AuthProvider extends ChangeNotifier {
     try {
       _setLoading(true);
       _clearError();
-      
+
+      // Check username availability first
+      final isUsernameAvailable = await _databaseService.isUsernameAvailable(username);
+      if (!isUsernameAvailable) {
+        _setError('Username "$username" is already taken');
+        return false;
+      }
+
       // Create auth account
       final error = await _authService.signUp(
         email: email,
         password: password,
         displayName: displayName,
       );
-      
+
       if (error != null) {
         _setError(error);
         return false;
       }
-      
+
       // Create user profile in Firestore
       if (_firebaseUser != null) {
         final userModel = UserModel.create(
@@ -128,18 +135,18 @@ class AuthProvider extends ChangeNotifier {
           username: username,
           displayName: displayName,
         );
-        
+
         final success = await _databaseService.createUser(userModel);
-        
+
         if (!success) {
           _setError('Failed to create user profile');
           return false;
         }
-        
+
         _currentUser = userModel;
         notifyListeners();
       }
-      
+
       return true;
     } catch (e) {
       _setError('An unexpected error occurred');

@@ -15,7 +15,7 @@ class SplashScreen extends StatelessWidget {
             ),
             SizedBox(height: 24),
             Text(
-              'AI Social Platform',
+              'Witnessed',
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).primaryColor,

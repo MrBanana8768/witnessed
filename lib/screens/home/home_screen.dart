@@ -13,7 +13,7 @@ class HomeScreen extends StatelessWidget {
     
     return Scaffold(
       appBar: AppBar(
-        title: Text('AI Social Platform'),
+        title: Text('Witnessed'),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Theme.of(context).colorScheme.primary,

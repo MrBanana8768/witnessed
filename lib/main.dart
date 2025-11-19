@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
       ],
       child: MaterialApp(
-        title: 'AI Social Platform',
+        title: 'Witnessed',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,

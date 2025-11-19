@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/database_service.dart';
 import '../../config/constants.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -12,6 +13,7 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _databaseService = DatabaseService();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -21,6 +23,8 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _isLoading = false;
+  String? _usernameError;
+  bool _checkingUsername = false;
 
   @override
   void dispose() {
@@ -30,6 +34,41 @@ class _SignupScreenState extends State<SignupScreen> {
     _displayNameController.dispose();
     _usernameController.dispose();
     super.dispose();
+  }
+
+  Future<void> _checkUsernameAvailability(String username) async {
+    // Clear previous error
+    setState(() {
+      _usernameError = null;
+      _checkingUsername = true;
+    });
+
+    // Skip check if username is empty or invalid format
+    if (username.trim().isEmpty || username.trim().length < 3) {
+      setState(() {
+        _checkingUsername = false;
+      });
+      return;
+    }
+
+    if (!AppConstants.usernameRegex.hasMatch(username.trim())) {
+      setState(() {
+        _checkingUsername = false;
+      });
+      return;
+    }
+
+    // Check availability
+    final isAvailable = await _databaseService.isUsernameAvailable(username.trim());
+
+    if (mounted) {
+      setState(() {
+        _checkingUsername = false;
+        if (!isAvailable) {
+          _usernameError = 'Username is already taken';
+        }
+      });
+    }
   }
 
   Future<void> _handleSignup() async {
@@ -158,9 +197,32 @@ class _SignupScreenState extends State<SignupScreen> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
+                    errorText: _usernameError,
+                    suffixIcon: _checkingUsername
+                        ? const Padding(
+                            padding: EdgeInsets.all(12.0),
+                            child: SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          )
+                        : (_usernameController.text.isNotEmpty && _usernameError == null
+                            ? const Icon(Icons.check_circle, color: Colors.green)
+                            : (_usernameError != null
+                                ? const Icon(Icons.error, color: Colors.red)
+                                : null)),
                   ),
                   textInputAction: TextInputAction.next,
                   maxLength: AppConstants.maxUsernameLength,
+                  onChanged: (value) {
+                    // Debounce the availability check
+                    Future.delayed(const Duration(milliseconds: 500), () {
+                      if (_usernameController.text == value) {
+                        _checkUsernameAvailability(value);
+                      }
+                    });
+                  },
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Username is required';
@@ -170,6 +232,9 @@ class _SignupScreenState extends State<SignupScreen> {
                     }
                     if (!AppConstants.usernameRegex.hasMatch(value.trim())) {
                       return 'Username can only contain letters, numbers, and underscores';
+                    }
+                    if (_usernameError != null) {
+                      return _usernameError;
                     }
                     return null;
                   },

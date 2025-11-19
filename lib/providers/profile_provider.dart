@@ -70,6 +70,20 @@ class ProfileProvider extends ChangeNotifier {
     _error = null;
 
     try {
+      // Check username availability if username is being changed
+      if (username != null && username != _user!.username) {
+        final isAvailable = await _databaseService.isUsernameAvailable(
+          username,
+          excludeUserId: _user!.id,
+        );
+
+        if (!isAvailable) {
+          _error = 'Username "$username" is already taken';
+          _setLoading(false);
+          return false;
+        }
+      }
+
       final updates = <String, dynamic>{};
 
       if (displayName != null) updates['displayName'] = displayName;

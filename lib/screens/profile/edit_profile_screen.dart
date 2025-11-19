@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/user_model.dart';
 import '../../providers/profile_provider.dart';
+import '../../services/database_service.dart';
 import '../../config/constants.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -18,6 +19,7 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _databaseService = DatabaseService();
   late TextEditingController _displayNameController;
   late TextEditingController _usernameController;
   late TextEditingController _bioController;
@@ -25,6 +27,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _locationController;
   bool _isPrivate = false;
   bool _hasChanges = false;
+  String? _usernameError;
 
   @override
   void initState() {
@@ -48,6 +51,39 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (!_hasChanges) {
       setState(() {
         _hasChanges = true;
+      });
+    }
+  }
+
+  Future<void> _checkUsernameAvailability(String username) async {
+    // Clear previous error
+    setState(() {
+      _usernameError = null;
+    });
+
+    // Skip check if username hasn't changed
+    if (username == widget.user.username) {
+      return;
+    }
+
+    // Skip check if username is empty or invalid format
+    if (username.trim().isEmpty || username.trim().length < 3) {
+      return;
+    }
+
+    if (!AppConstants.usernameRegex.hasMatch(username.trim())) {
+      return;
+    }
+
+    // Check availability
+    final isAvailable = await _databaseService.isUsernameAvailable(
+      username.trim(),
+      excludeUserId: widget.user.id,
+    );
+
+    if (!isAvailable && mounted) {
+      setState(() {
+        _usernameError = 'Username is already taken';
       });
     }
   }
@@ -204,13 +240,29 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               // Username
               TextFormField(
                 controller: _usernameController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Username',
                   hintText: 'Your unique username',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.alternate_email),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.alternate_email),
+                  errorText: _usernameError,
+                  suffixIcon: _usernameController.text != widget.user.username &&
+                          _usernameController.text.isNotEmpty
+                      ? (_usernameError == null
+                          ? const Icon(Icons.check_circle, color: Colors.green)
+                          : const Icon(Icons.error, color: Colors.red))
+                      : null,
                 ),
                 maxLength: AppConstants.maxUsernameLength,
+                onChanged: (value) {
+                  _onChanged();
+                  // Debounce the availability check
+                  Future.delayed(const Duration(milliseconds: 500), () {
+                    if (_usernameController.text == value) {
+                      _checkUsernameAvailability(value);
+                    }
+                  });
+                },
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'Username is required';
@@ -220,6 +272,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   }
                   if (!AppConstants.usernameRegex.hasMatch(value.trim())) {
                     return 'Username can only contain letters, numbers, and underscores';
+                  }
+                  if (_usernameError != null) {
+                    return _usernameError;
                   }
                   return null;
                 },

@@ -13,7 +13,7 @@ class DatabaseService {
           .collection(AppConstants.usersCollection)
           .doc(userId)
           .get();
-      
+
       if (doc.exists && doc.data() != null) {
         return UserModel.fromFirestore(doc.data()!, doc.id);
       }
@@ -21,6 +21,33 @@ class DatabaseService {
     } catch (e) {
       print('Error getting user: $e');
       return null;
+    }
+  }
+
+  /// Check if a username is already taken by another user
+  /// Returns true if available, false if taken
+  Future<bool> isUsernameAvailable(String username, {String? excludeUserId}) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection(AppConstants.usersCollection)
+          .where('username', isEqualTo: username)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        return true; // Username is available
+      }
+
+      // If excludeUserId is provided, check if the found user is the same user
+      // (This allows users to keep their current username when editing profile)
+      if (excludeUserId != null && querySnapshot.docs.first.id == excludeUserId) {
+        return true;
+      }
+
+      return false; // Username is taken
+    } catch (e) {
+      print('Error checking username availability: $e');
+      return false; // Assume taken on error to be safe
     }
   }
   
