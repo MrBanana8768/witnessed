@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'package:Witnessed/providers/auth_provider.dart' as app_auth_provider;
 import 'package:Witnessed/providers/profile_provider.dart';
+import 'package:Witnessed/providers/post_provider.dart';
 import 'package:Witnessed/services/auth_service.dart';
 
 
@@ -17,10 +18,12 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -32,6 +35,7 @@ class MyApp extends StatelessWidget {
               previous ?? app_auth_provider.AuthProvider(authService: authService),
         ),
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
+        ChangeNotifierProvider(create: (_) => PostProvider()),
       ],
       child: MaterialApp(
         title: 'Witnessed',
@@ -45,13 +49,15 @@ class MyApp extends StatelessWidget {
             brightness: Brightness.light,
           ),
         ),
-        home: AuthWrapper(),
+        home: const AuthWrapper(),
       ),
     );
   }
 }
 
 class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
@@ -60,14 +66,14 @@ class AuthWrapper extends StatelessWidget {
       stream: authService.authStateChanges,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return SplashScreen();
+          return const SplashScreen();
         }
         
         if (snapshot.hasData && snapshot.data != null) {
-          return HomeScreen();
+          return const HomeScreen();
         }
         
-        return LoginScreen();
+        return const LoginScreen();
       },
     );
   }

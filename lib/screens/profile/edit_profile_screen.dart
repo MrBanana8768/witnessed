@@ -3,15 +3,16 @@ import 'package:provider/provider.dart';
 import '../../models/user_model.dart';
 import '../../providers/profile_provider.dart';
 import '../../services/database_service.dart';
+import '../../widgets/common/app_navigation_rail.dart';
 import '../../config/constants.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final UserModel user;
 
   const EditProfileScreen({
-    Key? key,
+    super.key,
     required this.user,
-  }) : super(key: key);
+  });
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
@@ -191,25 +192,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Edit Profile'),
-          actions: [
-            TextButton(
-              onPressed: _hasChanges ? _saveProfile : null,
-              style: TextButton.styleFrom(
-                foregroundColor: _hasChanges ? Colors.white : Colors.white60,
-              ),
-              child: const Text(
-                'Save',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ),
-        body: Form(
+        body: Row(
+          children: [
+            // Navigation Rail
+            const AppNavigationRail(selectedIndex: 5),
+
+            // Vertical Divider
+            const VerticalDivider(thickness: 1, width: 1),
+
+            // Main Content
+            Expanded(
+              child: Column(
+                children: [
+                  // App Bar
+                  AppBar(
+                    title: const Text('Edit Profile'),
+                    automaticallyImplyLeading: true,
+                  ),
+
+                  // Form Content
+                  Expanded(
+                    child: Form(
           key: _formKey,
           child: ListView(
             padding: const EdgeInsets.all(16),
@@ -419,6 +422,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               const SizedBox(height: 32),
             ],
           ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

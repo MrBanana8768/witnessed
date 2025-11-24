@@ -1,25 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../../models/post_model.dart';
 import '../../providers/profile_provider.dart';
 import '../../services/auth_service.dart';
+import '../../services/database_service.dart';
+import '../../widgets/common/app_navigation_rail.dart';
+import '../../widgets/post/post_card.dart';
+import '../../widgets/profile/profile_bio.dart';
 import '../../widgets/profile/profile_header.dart';
 import '../../widgets/profile/profile_stats.dart';
-import '../../widgets/profile/profile_bio.dart';
 import 'edit_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String userId;
 
   const ProfileScreen({
-    Key? key,
+    super.key,
     required this.userId,
-  }) : super(key: key);
+  });
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  final DatabaseService _databaseService = DatabaseService();
+  List<PostModel> _userPosts = [];
+  bool _isLoadingPosts = true;
+
   @override
   void initState() {
     super.initState();
@@ -39,7 +48,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
       } else {
         context.read<ProfileProvider>().fetchUserProfile(widget.userId);
       }
+
+      // Fetch user's posts
+      _fetchUserPosts();
     });
+  }
+
+  Future<void> _fetchUserPosts() async {
+    setState(() {
+      _isLoadingPosts = true;
+    });
+
+    final posts = await _databaseService.getUserPosts(widget.userId);
+
+    if (mounted) {
+      setState(() {
+        _userPosts = posts;
+        _isLoadingPosts = false;
+      });
+    }
   }
 
   bool _isCurrentUser(BuildContext context) {
@@ -50,7 +77,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer<ProfileProvider>(
+      body: Row(
+        children: [
+          // Navigation Rail
+          const AppNavigationRail(selectedIndex: 5),
+
+          // Vertical Divider
+          const VerticalDivider(thickness: 1, width: 1),
+
+          // Main Content
+          Expanded(
+            child: Consumer<ProfileProvider>(
         builder: (context, profileProvider, child) {
           if (profileProvider.isLoading && profileProvider.user == null) {
             return const Center(
@@ -219,8 +256,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     const SizedBox(height: 16),
 
-                    // Posts List (placeholder)
-                    _buildPostsPlaceholder(context),
+                    // Posts List
+                    _buildUserPosts(),
 
                     const SizedBox(height: 32),
                   ],
@@ -229,39 +266,62 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildPostsPlaceholder(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(48),
-      child: Column(
-        children: [
-          Icon(
-            Icons.article_outlined,
-            size: 64,
-            color: Colors.grey[400],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'No posts yet',
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Posts will appear here',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[500],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildUserPosts() {
+    // Loading state
+    if (_isLoadingPosts) {
+      return const Padding(
+        padding: EdgeInsets.all(32),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    // Empty state
+    if (_userPosts.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(48),
+        child: Column(
+          children: [
+            Icon(
+              Icons.article_outlined,
+              size: 64,
+              color: Colors.grey[400],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No posts yet',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Posts will appear here',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[500],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Posts list
+    return Column(
+      children: _userPosts.map((post) => PostCard(
+        key: ValueKey(post.id),
+        post: post,
+      ),
+      ).toList(),
     );
   }
 

@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+
 import '../models/user_model.dart';
 import '../models/post_model.dart';
 import '../config/constants.dart';
@@ -19,7 +21,7 @@ class DatabaseService {
       }
       return null;
     } catch (e) {
-      print('Error getting user: $e');
+      debugPrint('Error getting user: $e');
       return null;
     }
   }
@@ -46,7 +48,7 @@ class DatabaseService {
 
       return false; // Username is taken
     } catch (e) {
-      print('Error checking username availability: $e');
+      debugPrint('Error checking username availability: $e');
       return false; // Assume taken on error to be safe
     }
   }
@@ -59,7 +61,7 @@ class DatabaseService {
           .set(user.toFirestore());
       return true;
     } catch (e) {
-      print('Error creating user: $e');
+      debugPrint('Error creating user: $e');
       return false;
     }
   }
@@ -72,7 +74,7 @@ class DatabaseService {
           .update(data);
       return true;
     } catch (e) {
-      print('Error updating user: $e');
+      debugPrint('Error updating user: $e');
       return false;
     }
   }
@@ -111,7 +113,7 @@ class DatabaseService {
 
       return null;
     } catch (e) {
-      print('Error ensuring user profile: $e');
+      debugPrint('Error ensuring user profile: $e');
       return null;
     }
   }
@@ -119,12 +121,28 @@ class DatabaseService {
   // Post operations
   Future<String?> createPost(PostModel post) async {
     try {
-      final docRef = await _firestore
+      final batch = _firestore.batch();
+
+      // Add the post
+      final postRef = _firestore
           .collection(AppConstants.postsCollection)
-          .add(post.toFirestore());
-      return docRef.id;
+          .doc();
+
+      batch.set(postRef, post.toFirestore());
+
+      // Increment user's posts count
+      final userRef = _firestore
+          .collection(AppConstants.usersCollection)
+          .doc(post.userId);
+
+      batch.update(userRef, {
+        'postsCount': FieldValue.increment(1),
+      });
+
+      await batch.commit();
+      return postRef.id;
     } catch (e) {
-      print('Error creating post: $e');
+      debugPrint('Error creating post: $e');
       return null;
     }
   }
@@ -138,34 +156,73 @@ class DatabaseService {
           .collection(AppConstants.postsCollection)
           .orderBy('createdAt', descending: true)
           .limit(limit);
-      
+
       if (lastDocument != null) {
         query = query.startAfterDocument(lastDocument);
       }
-      
+
       final snapshot = await query.get();
-      
+
       return snapshot.docs
           .map((doc) => PostModel.fromFirestore(
                 doc.data() as Map<String, dynamic>,
                 doc.id,
-              ))
+              ),
+      )
           .toList();
     } catch (e) {
-      print('Error getting posts: $e');
+      debugPrint('Error getting posts: $e');
+      return [];
+    }
+  }
+
+  /// Get posts by a specific user
+  Future<List<PostModel>> getUserPosts(String userId, {int limit = 20}) async {
+    try {
+      final snapshot = await _firestore
+          .collection(AppConstants.postsCollection)
+          .where('userId', isEqualTo: userId)
+          .orderBy('createdAt', descending: true)
+          .limit(limit)
+          .get();
+
+      return snapshot.docs
+          .map((doc) => PostModel.fromFirestore(
+                doc.data(),
+                doc.id,
+              ),
+      )
+          .toList();
+    } catch (e) {
+      debugPrint('Error getting user posts: $e');
       return [];
     }
   }
   
-  Future<bool> deletePost(String postId) async {
+  Future<bool> deletePost(String postId, String userId) async {
     try {
-      await _firestore
+      final batch = _firestore.batch();
+
+      // Delete the post
+      final postRef = _firestore
           .collection(AppConstants.postsCollection)
-          .doc(postId)
-          .delete();
+          .doc(postId);
+
+      batch.delete(postRef);
+
+      // Decrement user's posts count
+      final userRef = _firestore
+          .collection(AppConstants.usersCollection)
+          .doc(userId);
+
+      batch.update(userRef, {
+        'postsCount': FieldValue.increment(-1),
+      });
+
+      await batch.commit();
       return true;
     } catch (e) {
-      print('Error deleting post: $e');
+      debugPrint('Error deleting post: $e');
       return false;
     }
   }
@@ -199,7 +256,7 @@ class DatabaseService {
       await batch.commit();
       return true;
     } catch (e) {
-      print('Error liking post: $e');
+      debugPrint('Error liking post: $e');
       return false;
     }
   }
@@ -229,7 +286,7 @@ class DatabaseService {
       await batch.commit();
       return true;
     } catch (e) {
-      print('Error unliking post: $e');
+      debugPrint('Error unliking post: $e');
       return false;
     }
   }
@@ -277,7 +334,7 @@ class DatabaseService {
       await batch.commit();
       return true;
     } catch (e) {
-      print('Error following user: $e');
+      debugPrint('Error following user: $e');
       return false;
     }
   }
@@ -293,7 +350,9 @@ class DatabaseService {
             .map((doc) => PostModel.fromFirestore(
                   doc.data(),
                   doc.id,
-                ))
-            .toList());
+                ),
+    )
+            .toList(),
+    );
   }
 }

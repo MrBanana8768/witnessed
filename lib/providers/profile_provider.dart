@@ -48,7 +48,7 @@ class ProfileProvider extends ChangeNotifier {
       }
     } catch (e) {
       _error = 'Failed to load profile: $e';
-      print('Error fetching user profile: $e');
+      debugPrint('Error fetching user profile: $e');
     } finally {
       _setLoading(false);
     }
@@ -118,7 +118,7 @@ class ProfileProvider extends ChangeNotifier {
       }
     } catch (e) {
       _error = 'Failed to update profile: $e';
-      print('Error updating profile: $e');
+      debugPrint('Error updating profile: $e');
       return false;
     } finally {
       _setLoading(false);
@@ -162,7 +162,7 @@ class ProfileProvider extends ChangeNotifier {
       return false;
     } catch (e) {
       _error = 'Failed to upload profile photo: $e';
-      print('Error uploading profile photo: $e');
+      debugPrint('Error uploading profile photo: $e');
       return false;
     } finally {
       _setLoading(false);
@@ -206,7 +206,7 @@ class ProfileProvider extends ChangeNotifier {
       return false;
     } catch (e) {
       _error = 'Failed to upload cover photo: $e';
-      print('Error uploading cover photo: $e');
+      debugPrint('Error uploading cover photo: $e');
       return false;
     } finally {
       _setLoading(false);
@@ -236,7 +236,7 @@ class ProfileProvider extends ChangeNotifier {
       return true;
     } catch (e) {
       _error = 'Failed to toggle follow: $e';
-      print('Error toggling follow: $e');
+      debugPrint('Error toggling follow: $e');
       return false;
     }
   }

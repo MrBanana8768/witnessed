@@ -47,14 +47,14 @@ class AppRouter {
       GoRoute(
         path: '/',
         name: 'splash',
-        builder: (context, state) => SplashScreen(),
+        builder: (context, state) => const SplashScreen(),
       ),
       
       // Auth Routes
       GoRoute(
         path: '/login',
         name: 'login',
-        builder: (context, state) => LoginScreen(),
+        builder: (context, state) => const LoginScreen(),
       ),
       // TODO: Create SignupScreen
       // GoRoute(
@@ -73,7 +73,7 @@ class AppRouter {
       GoRoute(
         path: '/home',
         name: 'home',
-        builder: (context, state) => HomeScreen(),
+        builder: (context, state) => const HomeScreen(),
         // TODO: Uncomment when FeedScreen is created
         // routes: [
         //   // Nested routes for home

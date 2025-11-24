@@ -63,7 +63,7 @@ class AuthProvider extends ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      print('Error loading user data: $e');
+      debugPrint('Error loading user data: $e');
       _error = 'Failed to load user data';
       notifyListeners();
     }

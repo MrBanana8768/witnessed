@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatelessWidget {
+  const SplashScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -13,7 +15,7 @@ class SplashScreen extends StatelessWidget {
               size: 100,
               color: Theme.of(context).primaryColor,
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             Text(
               'Witnessed',
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -21,8 +23,8 @@ class SplashScreen extends StatelessWidget {
                 color: Theme.of(context).primaryColor,
               ),
             ),
-            SizedBox(height: 24),
-            CircularProgressIndicator(),
+            const SizedBox(height: 24),
+            const CircularProgressIndicator(),
           ],
         ),
       ),

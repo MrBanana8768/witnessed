@@ -4,6 +4,8 @@ import '../../providers/auth_provider.dart';
 import '../../config/constants.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -47,8 +49,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Account created successfully! Profile saved to database.'),
+          const SnackBar(
+            content: Text('Account created successfully!'),
             backgroundColor: Colors.green,
           ),
         );
@@ -78,7 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Please enter your email first'),
           backgroundColor: Colors.orange,
         ),
@@ -114,7 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(24.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -124,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   size: 80,
                   color: Theme.of(context).primaryColor,
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 Text(
                   'Witnessed',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -132,14 +134,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: Theme.of(context).primaryColor,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
                   _isSignUp ? 'Create your account' : 'Welcome back!',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Colors.grey[600],
                   ),
                 ),
-                SizedBox(height: 32),
+                const SizedBox(height: 32),
                 
                 // Form
                 Form(
@@ -153,7 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           decoration: InputDecoration(
                             labelText: 'Display Name',
                             hintText: 'John Doe',
-                            prefixIcon: Icon(Icons.person),
+                            prefixIcon: const Icon(Icons.person),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -172,13 +174,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             return null;
                           },
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         TextFormField(
                           controller: _usernameController,
                           decoration: InputDecoration(
                             labelText: 'Username',
                             hintText: 'johndoe',
-                            prefixIcon: Icon(Icons.alternate_email),
+                            prefixIcon: const Icon(Icons.alternate_email),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -200,7 +202,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             return null;
                           },
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                       ],
                       
                       // Email
@@ -209,7 +211,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         decoration: InputDecoration(
                           labelText: 'Email',
                           hintText: 'Enter your email',
-                          prefixIcon: Icon(Icons.email),
+                          prefixIcon: const Icon(Icons.email),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -229,7 +231,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           return null;
                         },
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       
                       // Password
                       TextFormField(
@@ -237,7 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         decoration: InputDecoration(
                           labelText: 'Password',
                           hintText: 'Enter your password',
-                          prefixIcon: Icon(Icons.lock),
+                          prefixIcon: const Icon(Icons.lock),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscurePassword
@@ -270,17 +272,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       
                       // Forgot Password
                       if (!_isSignUp) ...[
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(
                             onPressed: _resetPassword,
-                            child: Text('Forgot Password?'),
+                            child: const Text('Forgot Password?'),
                           ),
                         ),
                       ],
                       
-                      SizedBox(height: 24),
+                      const SizedBox(height: 24),
                       
                       // Submit Button
                       SizedBox(
@@ -294,7 +296,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           child: _isLoading
-                              ? SizedBox(
+                              ? const SizedBox(
                                   height: 20,
                                   width: 20,
                                   child: CircularProgressIndicator(
@@ -306,7 +308,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 )
                               : Text(
                                   _isSignUp ? 'Sign Up' : 'Sign In',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -314,7 +316,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       
                       // Toggle Sign Up / Sign In
                       Row(
@@ -335,7 +337,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             },
                             child: Text(
                               _isSignUp ? 'Sign In' : 'Sign Up',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
                         ],

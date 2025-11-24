@@ -8,12 +8,12 @@ class ProfileStats extends StatelessWidget {
   final VoidCallback? onPostsTap;
 
   const ProfileStats({
-    Key? key,
+    super.key,
     required this.user,
     this.onFollowersTap,
     this.onFollowingTap,
     this.onPostsTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

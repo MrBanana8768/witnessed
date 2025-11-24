@@ -4,7 +4,7 @@ import 'user_model.dart';
 
 part 'post_model.g.dart';
 
-enum PostType { text, image, video, link, poll, ai_generated }
+enum PostType { text, image, video, link, poll, aiGenerated }
 enum PostVisibility { public, followers, private }
 
 @JsonSerializable()

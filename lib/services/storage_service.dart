@@ -1,5 +1,8 @@
 import 'dart:io';
+
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
+
 import '../config/constants.dart';
 
 class StorageService {
@@ -23,7 +26,7 @@ class StorageService {
       }
       return null;
     } catch (e) {
-      print('Error uploading profile image: $e');
+      debugPrint('Error uploading profile image: $e');
       return null;
     }
   }
@@ -46,7 +49,7 @@ class StorageService {
       }
       return null;
     } catch (e) {
-      print('Error uploading cover image: $e');
+      debugPrint('Error uploading cover image: $e');
       return null;
     }
   }
@@ -74,7 +77,7 @@ class StorageService {
       
       return imageUrls;
     } catch (e) {
-      print('Error uploading post images: $e');
+      debugPrint('Error uploading post images: $e');
       return [];
     }
   }
@@ -96,10 +99,10 @@ class StorageService {
       
       final UploadTask uploadTask = ref.putFile(videoFile);
       
-      // Monitor upload progress
+      // Monitor upload progress (logged only in debug mode)
       uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
         final progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        print('Upload progress: ${progress.toStringAsFixed(2)}%');
+        debugPrint('Upload progress: ${progress.toStringAsFixed(2)}%');
       });
       
       final TaskSnapshot snapshot = await uploadTask;
@@ -110,7 +113,7 @@ class StorageService {
       }
       return null;
     } catch (e) {
-      print('Error uploading video: $e');
+      debugPrint('Error uploading video: $e');
       return null;
     }
   }
@@ -122,7 +125,7 @@ class StorageService {
       await ref.delete();
       return true;
     } catch (e) {
-      print('Error deleting file: $e');
+      debugPrint('Error deleting file: $e');
       return false;
     }
   }
@@ -138,7 +141,7 @@ class StorageService {
       await Future.wait(deleteFutures);
       return true;
     } catch (e) {
-      print('Error deleting files: $e');
+      debugPrint('Error deleting files: $e');
       return false;
     }
   }
@@ -158,7 +161,7 @@ class StorageService {
         'fullPath': metadata.fullPath,
       };
     } catch (e) {
-      print('Error getting file metadata: $e');
+      debugPrint('Error getting file metadata: $e');
       return null;
     }
   }
