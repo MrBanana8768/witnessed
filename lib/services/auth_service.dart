@@ -77,7 +77,7 @@ class AuthService extends ChangeNotifier {
     try {
       await _auth.signOut();
     } catch (e) {
-      print('Error signing out: $e');
+      debugPrint('Error signing out: $e');
     }
   }
   

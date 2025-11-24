@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter analyze:*)",
+      "Bash(cd /mnt/a/stgre/Documents/Witnessed APp/witnessed_app && flutter pub get:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,12 +1,12 @@
 class AppConstants {
   // App Info
-  static const String appName = 'AI Social Platform';
+  static const String appName = 'Witnessed';
   static const String appVersion = '1.0.0';
-  static const String appDescription = 'AI-powered social media platform';
+  static const String appDescription = 'Share moments, witness life';
   
   // API Endpoints
-  static const String apiBaseUrl = 'https://api.example.com/v1';
-  static const String aiApiBaseUrl = 'https://ai-api.example.com/v1';
+  static const String apiBaseUrl = 'https://api.instituteofconsciousnessawareness.com/v1';
+  static const String aiApiBaseUrl = 'https://ai-api.instituteofconsciousnessawareness.com/v1';
   
   // Firebase Collections
   static const String usersCollection = 'users';

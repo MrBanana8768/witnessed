@@ -1,4 +1,6 @@
 import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class AIService {
@@ -36,11 +38,11 @@ class AIService {
         final data = jsonDecode(response.body);
         return data['generated_text'];
       } else {
-        print('AI Generate Error: ${response.body}');
+        debugPrint('AI Generate Error: ${response.body}');
         return null;
       }
     } catch (e) {
-      print('AI Generate Exception: $e');
+      debugPrint('AI Generate Exception: $e');
       return null;
     }
   }
@@ -65,11 +67,11 @@ class AIService {
         final data = jsonDecode(response.body);
         return data['improved_content'];
       } else {
-        print('AI Improve Error: ${response.body}');
+        debugPrint('AI Improve Error: ${response.body}');
         return null;
       }
     } catch (e) {
-      print('AI Improve Exception: $e');
+      debugPrint('AI Improve Exception: $e');
       return null;
     }
   }
@@ -91,11 +93,11 @@ class AIService {
         final data = jsonDecode(response.body);
         return ModerationResult.fromJson(data);
       } else {
-        print('AI Moderation Error: ${response.body}');
+        debugPrint('AI Moderation Error: ${response.body}');
         return ModerationResult(isAppropriate: true, confidence: 0.0);
       }
     } catch (e) {
-      print('AI Moderation Exception: $e');
+      debugPrint('AI Moderation Exception: $e');
       return ModerationResult(isAppropriate: true, confidence: 0.0);
     }
   }
@@ -119,11 +121,11 @@ class AIService {
         final data = jsonDecode(response.body);
         return List<String>.from(data['hashtags'] ?? []);
       } else {
-        print('AI Hashtags Error: ${response.body}');
+        debugPrint('AI Hashtags Error: ${response.body}');
         return [];
       }
     } catch (e) {
-      print('AI Hashtags Exception: $e');
+      debugPrint('AI Hashtags Exception: $e');
       return [];
     }
   }
@@ -145,11 +147,11 @@ class AIService {
         final data = jsonDecode(response.body);
         return SentimentAnalysis.fromJson(data);
       } else {
-        print('AI Sentiment Error: ${response.body}');
+        debugPrint('AI Sentiment Error: ${response.body}');
         return null;
       }
     } catch (e) {
-      print('AI Sentiment Exception: $e');
+      debugPrint('AI Sentiment Exception: $e');
       return null;
     }
   }
@@ -175,11 +177,11 @@ class AIService {
         final data = jsonDecode(response.body);
         return data['reply'];
       } else {
-        print('AI Reply Error: ${response.body}');
+        debugPrint('AI Reply Error: ${response.body}');
         return null;
       }
     } catch (e) {
-      print('AI Reply Exception: $e');
+      debugPrint('AI Reply Exception: $e');
       return null;
     }
   }
@@ -203,11 +205,11 @@ class AIService {
         final data = jsonDecode(response.body);
         return data['summary'];
       } else {
-        print('AI Summarize Error: ${response.body}');
+        debugPrint('AI Summarize Error: ${response.body}');
         return null;
       }
     } catch (e) {
-      print('AI Summarize Exception: $e');
+      debugPrint('AI Summarize Exception: $e');
       return null;
     }
   }
